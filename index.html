@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>陪玩培训考核</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 12px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        header h1 {
+            font-size: 1.6em;
+            margin-bottom: 8px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+
+        .question-number {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 28px;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .question-text {
+            font-size: 1.1em;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.5;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .question-text span {
+            flex: 1;
+        }
+
+        .options {
+            margin-bottom: 20px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .option-item:hover, .option-item.active {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .option-item.selected {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .option-item.correct {
+            border-color: #38ef7d;
+            background: rgba(56, 239, 125, 0.1);
+        }
+
+        .option-item.wrong {
+            border-color: #eb3349;
+            background: rgba(235, 51, 73, 0.1);
+        }
+
+        .option-item.disabled {
+            pointer-events: none;
+        }
+
+        .option-item input {
+            margin-right: 10px;
+            margin-top: 3px;
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .option-item label {
+            flex: 1;
+            cursor: pointer;
+            font-size: 0.95em;
+            color: #555;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.3s ease;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            touch-action: manipulation;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);
+            color: white;
+        }
+
+        .score-display {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .score-display h2 {
+            font-size: 2em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .score-display .score {
+            font-size: 4em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .score-display .feedback {
+            font-size: 1.1em;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .result-detail {
+            max-height: none;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #f9f9f9;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-item .icon {
+            font-size: 1.2em;
+        }
+
+        .result-item.correct .icon {
+            color: #38ef7d;
+        }
+
+        .result-item.wrong .icon {
+            color: #eb3349;
+        }
+
+        .result-item .question-title {
+            font-size: 1em;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .result-item .options-list {
+            font-size: 0.9em;
+            color: #666;
+            margin-bottom: 10px;
+            padding-left: 10px;
+        }
+
+        .result-item .options-list li {
+            margin-bottom: 5px;
+        }
+
+        .result-item .options-list li.user-answer {
+            color: #eb3349;
+            font-weight: bold;
+        }
+
+        .result-item .options-list li.correct-answer {
+            color: #38ef7d;
+            font-weight: bold;
+        }
+
+        .result-item .answer-info {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .result-item .answer-info span {
+            margin-right: 15px;
+        }
+
+        .multiple-hint {
+            background: #fff3cd;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            color: #856404;
+            margin-bottom: 10px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            header h1 {
+                font-size: 1.4em;
+            }
+
+            .card {
+                padding: 15px;
+                border-radius: 12px;
+            }
+
+            .question-text {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📝 陪玩培训考核</h1>
+            <p>共25道题目，请认真作答</p>
+        </header>
+
+        <div class="card" id="quiz-card">
+            <div class="progress-info">
+                <span>题目 <span id="current-question">1</span> / <span id="total-questions">25</span></span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill" style="width: 4%"></div>
+            </div>
+
+            <div id="question-container">
+                <div class="question-text">
+                    <span class="question-number">1</span>
+                    <span>培训过后连接单群，对接单群内派发的单子有疑问应该</span>
+                </div>
+                <div class="options" id="options-container">
+                    <div class="option-item">
+                        <input type="radio" name="q1" value="A">
+                        <label>直接在群里问</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="radio" name="q1" value="B">
+                        <label>私信联系派单或向自己管理询问</label>
+                    </div>
+                    <div class="option-item">
+                        <input type="radio" name="q1" value="C">
+                        <label>语音条和文字介绍</label>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn">下一题 →</button>
+        </div>
+
+        <div class="card" id="result-card" style="display: none;">
+            <div class="score-display">
+                <h2>🎉 考试完成！</h2>
+                <div class="score" id="final-score">0</div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+            <div class="result-detail" id="result-detail"></div>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            {
+                question: '培训过后连接单群，对接单群内派发的单子有疑问应该',
+                options: ['直接在群里问', '私信联系派单或向自己管理询问', '语音条和文字介绍'],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '游戏里面加上老板后应该（）',
+                options: ['不说话，等老板开口', '不管不顾', '邀请老板组队，确认老板身份，截图给派单'],
+                answer: ['C'],
+                type: 'single'
+            },
+            {
+                question: '自己接了单的单子不想打了，可以给别人打（）',
+                options: ['是', '否'],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '老板老板，续费必须告诉派单（）',
+                options: ['是', '否'],
+                answer: ['A'],
+                type: 'single'
+            },
+            {
+                question: '接单群没有单子，可以私下去问派单有没有单子',
+                options: ['是', '否'],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '带设备是指',
+                options: ['平板', '电脑', '平板和电脑'],
+                answer: ['C'],
+                type: 'single'
+            },
+            {
+                question: '进试音群，我们应该发什么',
+                options: ['我们真实姓名', '语音条和文字条', '单播截图', '个人联系方式'],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '王者v可排星耀9半7/3卡死李白的意思',
+                options: ['王者徽区星耀局可排9元半小时，7元一局打三局，只要李白', '王者徽区星耀局可排9元半小时，三元一局打七局，不要李白'],
+                answer: ['A'],
+                type: 'single'
+            },
+            {
+                question: '炸单了是指什么情况（多选）',
+                options: [
+                    '打了一半后选择不打了',
+                    '老板选完陪陪消失不见，五分钟无人回复',
+                    '游戏中中途打一半人不见了',
+                    '预约单迟到，爽约',
+                    '同时接两个以上的单子'
+                ],
+                answer: ['A', 'B', 'C', 'E'],
+                type: 'multiple'
+            },
+            {
+                question: '派单在接单群/试音群里扣1扣7是什么意思？',
+                options: [
+                    '扣1表示接单员准备接单，扣7需要7个人接单',
+                    '扣1单子选一个人，扣7选7个陪玩',
+                    '扣1单子已经有人接了，扣7代表老板弃单了'
+                ],
+                answer: ['C'],
+                type: 'single'
+            },
+            {
+                question: '在接单群有哪些不允许的行为和罚款',
+                options: [
+                    '打卡拍一拍签到，私拉没培训的陪玩罚款6.6',
+                    '禁止任何形式聊天罚款6.6',
+                    '以上都是'
+                ],
+                answer: ['A'],
+                type: 'single'
+            },
+            {
+                question: '王者技术你双条需要报什么',
+                options: ['大区/段位/KD', '大区/段位/擅长英雄位置'],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '游戏单子结账都要给派单员发什么单(多选题)',
+                options: [
+                    '开始组队截图',
+                    '游戏战绩截图',
+                    '反馈(不少于40字)',
+                    '删老板好友录屏',
+                    '不需要发'
+                ],
+                answer: ['A', 'B', 'C', 'D'],
+                type: 'multiple'
+            },
+            {
+                question: '发现私信与老板加好友会有什么处罚',
+                options: [
+                    '发现私信与老板加好友第一次罚款88，第二次罚款88*2，第三次罚款',
+                    '发现私信与老板加好友第一次罚款99，第二次罚款99*2，第三次罚款',
+                    '罚款6.6'
+                ],
+                answer: ['A'],
+                type: 'single'
+            },
+            {
+                question: '给老板曝单价第一次（）第二次（）',
+                options: [
+                    '给老板曝单价第一次(警告)第二次(踢团)',
+                    '给老板曝单价第一次(罚款等额单价回炉重造)第二次(踢团)',
+                    '给老板曝单价第一次(罚款88)第二次踢团'
+                ],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '单子结账没有开始组队/结束截图/反馈，少一个扣多少',
+                options: [
+                    '少一个扣除百分之20，三个都没有不结账',
+                    '少一个扣除百分之30，三个都没有不结账',
+                    '少一个扣除百分之35，三个都没有不结账'
+                ],
+                answer: ['A'],
+                type: 'single'
+            },
+            {
+                question: '老板问你要联系方式你应该',
+                options: [
+                    '果断给老板自己联系方式',
+                    '让其买好友位，让他联系派单咨询好友位价格，不可自己随意定价给老板'
+                ],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '试音群禁止行为及违规罚款(多选题)',
+                options: [
+                    '不试音罚款6.6',
+                    '不按要求试音，卖修等一切不公平竞争抢单行为',
+                    '不改名、闲聊、早退6.6'
+                ],
+                answer: ['A', 'B', 'C'],
+                type: 'multiple'
+            },
+            {
+                question: '老板送礼物你应该',
+                options: ['私自收下不告诉派单', '和派单四六分，陪玩6，派单4'],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '同一个老板送单第一次0送单第二次0送单第三次0',
+                options: [
+                    '同一个老板送单第一次(归派单)送单第二次(归派单二八分)送单第三次(全归陪玩)',
+                    '同一个老板送单第一次(归派单)送单第二次(陪玩派单三七分)送单第三次(全归陪玩)',
+                    '同一个老板送单第一次(归派单)送单第二次(陪玩派单五五分)送单第三次(全归陪玩)'
+                ],
+                answer: ['C'],
+                type: 'single'
+            },
+            {
+                question: '团内男女陪谈恋爱第一次罚款0第二次罚款0第三次0',
+                options: [
+                    '团内男女陪谈恋爱第一次罚款(6.6)第二次罚款(6.6)',
+                    '团内男女陪谈恋爱第一次(归派单)第二次(陪玩派单五五分)送单第三次(全归陪玩)',
+                    '团内男女陪谈恋爱第一次(归派单)第二次(陪玩派单五五分)送单第三次(全归陪玩)'
+                ],
+                answer: ['B'],
+                type: 'single'
+            },
+            {
+                question: '进团内你组群/接单群/试音群等群必须改单名字',
+                options: [
+                    '同一个老板送单第一次(归派单)第二次(陪玩派单二八分)送单第三次(全归陪玩)',
+                    '同一个老板送单第一次(归派单)第二次(陪玩派单三七分)送单第三次(全归陪玩)',
+                    '同一个老板送单第一次(归派单)第二次(陪玩派单五五分)送单第三次(全归陪玩)'
+                ],
+                answer: ['A'],
+                type: 'single'
+            },
+            {
+                question: '陪玩单应该一单一删，不可留好友位',
+                options: ['陪玩单应该一单一删，不可留好友位', '陪玩单应该一单一删，不可留好友位', '陪玩单应该一单一删，不可留好友位'],
+                answer: ['A'],
+                type: 'single'
+            },
+            {
+                question: '陪玩单应该一单一删，不可留好友位',
+                options: [
+                    '陪玩单应该一单一删，不可留好友位',
+                    '陪玩单可以保留老板好友位',
+                    '陪玩单应该一单一删，不可留好友位',
+                    '陪玩单应该一单一删，不可留好友位',
+                    '陪玩单应该一单一删，不可留好友位',
+                    '陪玩单应该一单一删，不可留好友位',
+                    '陪玩单应该一单一删，不可留好友位'
+                ],
+                answer: ['A', 'B', 'C', 'D', 'E', 'G'],
+                type: 'multiple'
+            },
+            {
+                question: '接单过程中让您交钱/下载app/提供手机号/私加你提供大单子等等是否为骗子',
+                options: ['是', '否'],
+                answer: ['A'],
+                type: 'single'
+            }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+        let userAnswers = [];
+
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            const container = document.getElementById('question-container');
+            const optionsContainer = document.getElementById('options-container');
+
+            let hintHtml = '';
+            if (q.type === 'multiple') {
+                hintHtml = '<div class="multiple-hint">💡 本题为多选题，请选择所有正确答案</div>';
+            }
+
+            container.innerHTML = `
+                <div class="question-text">
+                    <span class="question-number">${currentQuestion + 1}</span>
+                    <span>${q.question}</span>
+                </div>
+                ${hintHtml}
+                <div class="options" id="options-container">
+                    ${q.options.map((opt, i) => {
+                        const letter = String.fromCharCode(65 + i);
+                        return `
+                            <div class="option-item" onclick="selectOption('${letter}')">
+                                <input type="${q.type === 'multiple' ? 'checkbox' : 'radio'}" name="q${currentQuestion}" value="${letter}">
+                                <label>${letter}. ${opt}</label>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+
+            document.getElementById('current-question').textContent = currentQuestion + 1;
+            document.getElementById('progress-fill').style.width = ((currentQuestion + 1) / questions.length * 100) + '%';
+
+            const nextBtn = document.getElementById('next-btn');
+            if (currentQuestion === questions.length - 1) {
+                nextBtn.textContent = '提交答案';
+            } else {
+                nextBtn.textContent = '下一题 →';
+            }
+        }
+
+        function selectOption(letter) {
+            const q = questions[currentQuestion];
+            const options = document.querySelectorAll('.option-item');
+            
+            options.forEach((opt, i) => {
+                const optLetter = String.fromCharCode(65 + i);
+                const input = opt.querySelector('input');
+                
+                if (q.type === 'multiple') {
+                    if (optLetter === letter) {
+                        input.checked = !input.checked;
+                    }
+                } else {
+                    input.checked = optLetter === letter;
+                }
+                
+                opt.classList.toggle('selected', input.checked);
+            });
+        }
+
+        function nextQuestion() {
+            const q = questions[currentQuestion];
+            const selected = Array.from(document.querySelectorAll('.option-item input:checked'))
+                .map(input => input.value);
+            
+            userAnswers.push(selected);
+
+            const isCorrect = arraysEqual(selected.sort(), q.answer.sort());
+            if (isCorrect) {
+                score++;
+            }
+
+            if (currentQuestion === questions.length - 1) {
+                showResult();
+            } else {
+                currentQuestion++;
+                loadQuestion();
+            }
+        }
+
+        function arraysEqual(a, b) {
+            if (a.length !== b.length) return false;
+            return a.every((val, idx) => val === b[idx]);
+        }
+
+        function showResult() {
+            document.getElementById('quiz-card').style.display = 'none';
+            document.getElementById('result-card').style.display = 'block';
+
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('final-score').textContent = `${score} / ${questions.length}`;
+
+            let feedback = '';
+            if (percentage >= 90) {
+                feedback = '🏆 优秀！你已经完全掌握了陪玩规则！';
+            } else if (percentage >= 70) {
+                feedback = '👍 良好！继续加油！';
+            } else if (percentage >= 60) {
+                feedback = '💪 及格！还需要多加学习！';
+            } else {
+                feedback = '📚 需要重新学习培训内容！';
+            }
+            let detailHtml = '';
+            questions.forEach((q, i) => {
+                const isCorrect = arraysEqual(userAnswers[i].sort(), q.answer.sort());
+                const userAns = userAnswers[i].join(', ');
+                const correctAns = q.answer.join(', ');
+
+                let optionsHtml = q.options.map((opt, idx) => {
+                    const letter = String.fromCharCode(65 + idx);
+                    let className = '';
+                    if (q.answer.includes(letter)) {
+                        className = 'correct-answer';
+                    }
+                    if (userAnswers[i].includes(letter)) {
+                        className = className ? '' : 'user-answer';
+                    }
+                    const mark = className ? (className === 'correct-answer' ? ' ✓' : ' ✗') : '';
+                    return `<li class="${className}">${letter}. ${opt}${mark}</li>`;
+                }).join('');
+
+                detailHtml += `
+                    <div class="result-item ${isCorrect ? 'correct' : 'wrong'}">
+                        <div class="question-title"><span class="icon">${isCorrect ? '✅' : '❌'}</span> 第${i + 1}题：${q.question}</div>
+                        <ul class="options-list">${optionsHtml}</ul>
+                        <div class="answer-info">
+                            <span>你的答案: ${userAns || '未作答'}</span>
+                            <span>正确答案: ${correctAns}</span>
+                        </div>
+                    </div>
+                `;
+            });
+            document.getElementById('result-detail').innerHTML = detailHtml;
+        }
+
+        function restartQuiz() {
+            currentQuestion = 0;
+            score = 0;
+            userAnswers = [];
+            document.getElementById('result-card').style.display = 'none';
+            document.getElementById('quiz-card').style.display = 'block';
+            loadQuestion();
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
